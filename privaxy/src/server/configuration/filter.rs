@@ -65,12 +65,7 @@ pub struct DefaultFilters(Vec<DefaultFilter>);
 impl DefaultFilters {
     pub fn new() -> Self {
         let mut filters = Vec::new();
-        filters.extend(Self::get_default_filters());
-        filters.extend(Self::get_ads_filters());
-        filters.extend(Self::get_privacy_filters());
-        filters.extend(Self::get_malware_filters());
-        filters.extend(Self::get_social_filters());
-        filters.extend(Self::get_regional_filters());
+        filters.extend(Self::get_cecl_filters());
         DefaultFilters(filters)
     }
 
@@ -102,133 +97,182 @@ impl DefaultFilters {
         }
     }
 
-    fn get_default_filters() -> Vec<DefaultFilter> {
+    fn get_cecl_filters() -> Vec<DefaultFilter> {
         vec![
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt", "uBlock filters", FilterGroup::Default, true),
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters-mobile.txt", "uBlock mobile filters", FilterGroup::Default, true),
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt", "uBlock filters - Badware risks", FilterGroup::Default, true),
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt", "uBlock filters - Privacy", FilterGroup::Default, true),
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/resource-abuse.txt", "uBlock filters - Resource abuse", FilterGroup::Default, true),
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt", "uBlock filters - Unbreak", FilterGroup::Default, true),
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt", "uBlock filters - Quick Fixes", FilterGroup::Default, true),
-        ]
-        .into_iter()
-        .filter_map(|(url, title, group, enabled_by_default)| Self::parse_filter(url, title, group, enabled_by_default))
-        .collect()
-    }
-
-    fn get_ads_filters() -> Vec<DefaultFilter> {
-        vec![
-            (
-                "https://filters.adtidy.org/extension/ublock/filters/2_without_easylist.txt",
-                "AdGuard Base",
-                FilterGroup::Ads,
-                false,
-            ),
-            (
-                "https://filters.adtidy.org/extension/ublock/filters/11.txt",
-                "AdGuard Mobile Ads",
-                FilterGroup::Ads,
-                false,
-            ),
-            (
-                "https://easylist.to/easylist/easylist.txt",
-                "EasyList",
-                FilterGroup::Ads,
-                true,
-            ),
-        ]
-        .into_iter()
-        .filter_map(|(url, title, group, enabled_by_default)| {
-            Self::parse_filter(url, title, group, enabled_by_default)
-        })
-        .collect()
-    }
-
-    fn get_privacy_filters() -> Vec<DefaultFilter> {
-        vec![
-            ("https://filters.adtidy.org/extension/ublock/filters/3.txt", "AdGuard Tracking Protection", FilterGroup::Privacy, false),
-            ("https://filters.adtidy.org/extension/ublock/filters/17.txt", "AdGuard URL Tracking Protection", FilterGroup::Privacy, false),
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/lan-block.txt", "Block Outsider Intrusion into LAN", FilterGroup::Privacy, false),
-            ("https://easylist.to/easylist/easyprivacy.txt", "EasyPrivacy", FilterGroup::Privacy, true),
-        ]
-        .into_iter()
-        .filter_map(|(url, title, group, enabled_by_default)| Self::parse_filter(url, title, group, enabled_by_default))
-        .collect()
-    }
-
-    fn get_malware_filters() -> Vec<DefaultFilter> {
-        vec![
-            (
-                "https://curben.gitlab.io/malware-filter/phishing-filter.txt",
-                "Phishing URL Blocklist",
-                FilterGroup::Malware,
-                false,
-            ),
-            (
-                "https://curben.gitlab.io/malware-filter/pup-filter.txt",
-                "PUP Domains Blocklist",
-                FilterGroup::Malware,
-                false,
-            ),
-        ]
-        .into_iter()
-        .filter_map(|(url, title, group, enabled_by_default)| {
-            Self::parse_filter(url, title, group, enabled_by_default)
-        })
-        .collect()
-    }
-
-    fn get_social_filters() -> Vec<DefaultFilter> {
-        vec![
-            ("https://filters.adtidy.org/extension/ublock/filters/14.txt", "AdGuard Annoyances", FilterGroup::Social, false),
-            ("https://filters.adtidy.org/extension/ublock/filters/4.txt", "AdGuard Social Media", FilterGroup::Social, false),
-            ("https://secure.fanboy.co.nz/fanboy-antifacebook.txt", "Anti-Facebook", FilterGroup::Social, false),
-            ("https://secure.fanboy.co.nz/fanboy-annoyance.txt", "Fanboy's Annoyance", FilterGroup::Social, false),
-            ("https://secure.fanboy.co.nz/fanboy-cookiemonster.txt", "EasyList Cookie", FilterGroup::Social, false),
-            ("https://easylist.to/easylist/fanboy-social.txt", "Fanboy's Social", FilterGroup::Social, false),
-            ("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/annoyances.txt", "uBlock filters - Annoyances", FilterGroup::Social, false),
-        ]
-        .into_iter()
-        .filter_map(|(url, title, group, enabled_by_default)| Self::parse_filter(url, title, group, enabled_by_default))
-        .collect()
-    }
-
-    fn get_regional_filters() -> Vec<DefaultFilter> {
-        vec![
-            ("https://easylist-downloads.adblockplus.org/Liste_AR.txt", "ara: Liste AR", FilterGroup::Regional, false),
-            ("https://stanev.org/abp/adblock_bg.txt", "BGR: Bulgarian Adblock list", FilterGroup::Regional, false),
-            ("https://filters.adtidy.org/extension/ublock/filters/224.txt", "CHN: AdGuard Chinese (中文)", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt", "CZE, SVK: EasyList Czech and Slovak", FilterGroup::Regional, false),
-            ("https://easylist.to/easylistgermany/easylistgermany.txt", "DEU: EasyList Germany", FilterGroup::Regional, false),
-            ("https://adblock.ee/list.php", "EST: Eesti saitidele kohandatud filter", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/finnish-easylist-addition/finnish-easylist-addition/master/Finland_adb.txt", "FIN: Adblock List for Finland", FilterGroup::Regional, false),
-            ("https://filters.adtidy.org/extension/ublock/filters/16.txt", "FRA: AdGuard Français", FilterGroup::Regional, false),
-            ("https://www.void.gr/kargig/void-gr-filters.txt", "GRC: Greek AdBlock Filter", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/hufilter/hufilter/master/hufilter-ublock.txt", "HUN: hufilter", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt", "IDN, MYS: ABPindo", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/farrokhi/adblock-iran/master/filter.txt", "IRN: Adblock-Iran", FilterGroup::Regional, false),
-            ("https://adblock.gardar.net/is.abp.txt", "ISL: Icelandic ABP List", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/easylist/EasyListHebrew/master/EasyListHebrew.txt", "ISR: EasyList Hebrew", FilterGroup::Regional, false),
-            ("https://easylist-downloads.adblockplus.org/easylistitaly.txt", "ITA: EasyList Italy", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/gioxx/xfiles/master/filtri.txt", "ITA: ABP X Files", FilterGroup::Regional, false),
-            ("https://filters.adtidy.org/extension/ublock/filters/7.txt", "JPN: AdGuard Japanese", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/yous/YousList/master/youslist.txt", "KOR: YousList", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/EasyList-Lithuania/easylist_lithuania/master/easylistlithuania.txt", "LTU: EasyList Lithuania", FilterGroup::Regional, false),
-            ("https://notabug.org/latvian-list/adblock-latvian/raw/master/lists/latvian-list.txt", "LVA: Latvian List", FilterGroup::Regional, false),
-            ("https://easylist-downloads.adblockplus.org/easylistdutch.txt", "NLD: EasyList Dutch", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianList.txt", "NOR, DNK, ISL: Dandelion Sprouts nordiske filtre", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-adblock-filters/adblock.txt", "POL: Oficjalne Polskie Filtry do AdBlocka, uBlocka Origin i AdGuarda", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/olegwukr/polish-privacy-filters/master/anti-adblock.txt", "POL: Oficjalne polskie filtry przeciwko alertom o Adblocku", FilterGroup::Regional, false),
-            ("https://road.adblock.ro/lista.txt", "ROU: Romanian Ad (ROad) Block List Light", FilterGroup::Regional, false),
-            ("https://easylist-downloads.adblockplus.org/advblock+cssfixes.txt", "RUS: RU AdList", FilterGroup::Regional, false),
-            ("https://easylist-downloads.adblockplus.org/easylistspanish.txt", "spa: EasyList Spanish", FilterGroup::Regional, false),
-            ("https://filters.adtidy.org/extension/ublock/filters/9.txt", "spa, por: AdGuard Spanish/Portuguese", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/betterwebleon/slovenian-list/master/filters.txt", "SVN: Slovenian List", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/master/Frellwits-Swedish-Filter.txt", "SWE: Frellwit's Swedish Filter", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/easylist-thailand/easylist-thailand/master/subscription/easylist-thailand.txt", "THA: EasyList Thailand", FilterGroup::Regional, false),
-            ("https://filters.adtidy.org/extension/ublock/filters/13.txt", "TUR: AdGuard Turkish", FilterGroup::Regional, false),
-            ("https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_ublock.txt", "VIE: ABPVN List", FilterGroup::Regional, false),
+            ("http://adblock.ee/list.txt", "http://adblock.ee/list.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/DandelionSprout/adfilt@master/NorwegianList.txt", "http://cdn.jsdelivr.net/gh/DandelionSprout/adfilt@master/NorwegianList.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/DandelionSprout/adfilt@master/SerboCroatianList.txt", "http://cdn.jsdelivr.net/gh/DandelionSprout/adfilt@master/SerboCroatianList.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/EasyList-Lithuania/easylist_lithuania@master/easylistlithuania.txt", "http://cdn.jsdelivr.net/gh/EasyList-Lithuania/easylist_lithuania@master/easylistlithuania.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/filter-uBlockOrigin.txt", "http://cdn.jsdelivr.net/gh/List-KR/List-KR@latest/filter-uBlockOrigin.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/MasterKia/PersianBlocker@main/PersianBlocker.txt", "http://cdn.jsdelivr.net/gh/MasterKia/PersianBlocker@main/PersianBlocker.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/dimisa-RUAdList/RUAdListCDN@main/lists/ruadlist.ubo.min.txt", "http://cdn.jsdelivr.net/gh/dimisa-RUAdList/RUAdListCDN@main/lists/ruadlist.ubo.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/easylist/ruadlist@master/cntblock.txt", "http://cdn.jsdelivr.net/gh/easylist/ruadlist@master/cntblock.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/hufilter/hufilter@gh-pages/hufilter-ublock.txt", "http://cdn.jsdelivr.net/gh/hufilter/hufilter@gh-pages/hufilter-ublock.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/lassekongo83/Frellwits-filter-lists@swefilter/swefilter.min.txt", "http://cdn.jsdelivr.net/gh/lassekongo83/Frellwits-filter-lists@swefilter/swefilter.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/annoyances-cookies.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/annoyances-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/annoyances.min.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/annoyances.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/badlists.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/badlists.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/badware.min.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/badware.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/filters.min.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/filters.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/lan-block.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/lan-block.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/privacy.min.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/privacy.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/quick-fixes.min.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/quick-fixes.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/unbreak.min.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/filters/unbreak.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-annoyances.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-annoyances.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-chat.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-chat.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-cookies.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-newsletters.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-newsletters.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-notifications.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-notifications.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-social.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist-social.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easylist.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easyprivacy.txt", "http://cdn.jsdelivr.net/gh/uBlockOrigin/uAssetsCDN@main/thirdparties/easyprivacy.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/EasyList-Lithuania/easylist_lithuania/master/easylistlithuania.txt", "http://cdn.statically.io/gh/EasyList-Lithuania/easylist_lithuania/master/easylistlithuania.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/MasterKia/PersianBlocker/main/PersianBlocker.txt", "http://cdn.statically.io/gh/MasterKia/PersianBlocker/main/PersianBlocker.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/dimisa-RUAdList/RUAdListCDN/main/lists/ruadlist.ubo.min.txt", "http://cdn.statically.io/gh/dimisa-RUAdList/RUAdListCDN/main/lists/ruadlist.ubo.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/easylist/ruadlist/master/cntblock.txt", "http://cdn.statically.io/gh/easylist/ruadlist/master/cntblock.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/annoyances-cookies.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/annoyances-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/annoyances.min.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/annoyances.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/badlists.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/badlists.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/badware.min.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/badware.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/filters.min.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/filters.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/lan-block.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/lan-block.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/privacy.min.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/privacy.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/quick-fixes.min.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/quick-fixes.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/unbreak.min.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/filters/unbreak.min.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-annoyances.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-annoyances.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-chat.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-chat.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-cookies.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-newsletters.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-newsletters.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-notifications.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-notifications.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-social.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist-social.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easylist.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easyprivacy.txt", "http://cdn.statically.io/gh/uBlockOrigin/uAssetsCDN/main/thirdparties/easyprivacy.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gl/DandelionSprout/adfilt/master/NorwegianList.txt", "http://cdn.statically.io/gl/DandelionSprout/adfilt/master/NorwegianList.txt's filters", FilterGroup::Default, true),
+            ("http://cdn.statically.io/gl/DandelionSprout/adfilt/master/SerboCroatianList.txt", "http://cdn.statically.io/gl/DandelionSprout/adfilt/master/SerboCroatianList.txt's filters", FilterGroup::Default, true),
+            ("http://curbengh.github.io/malware-filter/urlhaus-filter-ag-online.txt", "http://curbengh.github.io/malware-filter/urlhaus-filter-ag-online.txt's filters", FilterGroup::Default, true),
+            ("http://curbengh.github.io/phishing-filter/phishing-filter.txt", "http://curbengh.github.io/phishing-filter/phishing-filter.txt's filters", FilterGroup::Default, true),
+            ("http://easylist-downloads.adblockplus.org/Liste_AR.txt", "http://easylist-downloads.adblockplus.org/Liste_AR.txt's filters", FilterGroup::Default, true),
+            ("http://easylist-downloads.adblockplus.org/easylistgermany.txt", "http://easylist-downloads.adblockplus.org/easylistgermany.txt's filters", FilterGroup::Default, true),
+            ("http://easylist-downloads.adblockplus.org/easylistitaly.txt", "http://easylist-downloads.adblockplus.org/easylistitaly.txt's filters", FilterGroup::Default, true),
+            ("http://easylist-downloads.adblockplus.org/easylistspanish.txt", "http://easylist-downloads.adblockplus.org/easylistspanish.txt's filters", FilterGroup::Default, true),
+            ("http://easylist-downloads.adblockplus.org/indianlist.txt", "http://easylist-downloads.adblockplus.org/indianlist.txt's filters", FilterGroup::Default, true),
+            ("http://easylist.to/easylistgermany/easylistgermany.txt", "http://easylist.to/easylistgermany/easylistgermany.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/11.txt", "http://filters.adtidy.org/extension/ublock/filters/11.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/13.txt", "http://filters.adtidy.org/extension/ublock/filters/13.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/16.txt", "http://filters.adtidy.org/extension/ublock/filters/16.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/17.txt", "http://filters.adtidy.org/extension/ublock/filters/17.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/18.txt", "http://filters.adtidy.org/extension/ublock/filters/18.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/19.txt", "http://filters.adtidy.org/extension/ublock/filters/19.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/20.txt", "http://filters.adtidy.org/extension/ublock/filters/20.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/21.txt", "http://filters.adtidy.org/extension/ublock/filters/21.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/22.txt", "http://filters.adtidy.org/extension/ublock/filters/22.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/224.txt", "http://filters.adtidy.org/extension/ublock/filters/224.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/2_without_easylist.txt", "http://filters.adtidy.org/extension/ublock/filters/2_without_easylist.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/3.txt", "http://filters.adtidy.org/extension/ublock/filters/3.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/4.txt", "http://filters.adtidy.org/extension/ublock/filters/4.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/7.txt", "http://filters.adtidy.org/extension/ublock/filters/7.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/8.txt", "http://filters.adtidy.org/extension/ublock/filters/8.txt's filters", FilterGroup::Default, true),
+            ("http://filters.adtidy.org/extension/ublock/filters/9.txt", "http://filters.adtidy.org/extension/ublock/filters/9.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/easylist/easylist.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/easylist/easylist.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/easylist/easyprivacy.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/easylist/easyprivacy.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/pgl.yoyo.org/as/serverlist", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/pgl.yoyo.org/as/serverlist's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/pgl.yoyo.org/as/serverlist.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/pgl.yoyo.org/as/serverlist.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/urlhaus-filter/urlhaus-filter-online.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/thirdparties/urlhaus-filter/urlhaus-filter-online.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/badlists.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/badlists.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/badware.min.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/badware.min.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/badware.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/badware.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/filters.min.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/filters.min.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/filters.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/filters.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/privacy.min.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/privacy.min.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/privacy.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/privacy.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/quick-fixes.min.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/quick-fixes.min.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/quick-fixes.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/quick-fixes.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/unbreak.min.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/unbreak.min.txt's filters", FilterGroup::Default, true),
+            ("http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/unbreak.txt", "http://github.com/uBlockOrigin/uAssets/raw/refs/heads/master/ublock/unbreak.txt's filters", FilterGroup::Default, true),
+            ("http://malware-filter.gitlab.io/phishing-filter/phishing-filter.txt", "http://malware-filter.gitlab.io/phishing-filter/phishing-filter.txt's filters", FilterGroup::Default, true),
+            ("http://malware-filter.gitlab.io/urlhaus-filter/urlhaus-filter-ag-online.txt", "http://malware-filter.gitlab.io/urlhaus-filter/urlhaus-filter-ag-online.txt's filters", FilterGroup::Default, true),
+            ("http://malware-filter.pages.dev/urlhaus-filter-ag-online.txt", "http://malware-filter.pages.dev/urlhaus-filter-ag-online.txt's filters", FilterGroup::Default, true),
+            ("http://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=1&mimetype=plaintext", "http://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=1&mimetype=plaintext's filters", FilterGroup::Default, true),
+            ("http://phishing-filter.pages.dev/phishing-filter.txt", "http://phishing-filter.pages.dev/phishing-filter.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt", "http://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/AnXh3L0/blocklist/master/albanian-easylist-addition/Albania.txt", "http://raw.githubusercontent.com/AnXh3L0/blocklist/master/albanian-easylist-addition/Albania.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianList.txt", "http://raw.githubusercontent.com/DandelionSprout/adfilt/master/NorwegianList.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/DandelionSprout/adfilt/master/SerboCroatianList.txt", "http://raw.githubusercontent.com/DandelionSprout/adfilt/master/SerboCroatianList.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/DeepSpaceHarbor/Macedonian-adBlock-Filters/master/Filters", "http://raw.githubusercontent.com/DeepSpaceHarbor/Macedonian-adBlock-Filters/master/Filters's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/EasyList-Lithuania/easylist_lithuania/master/easylistlithuania.txt", "http://raw.githubusercontent.com/EasyList-Lithuania/easylist_lithuania/master/easylistlithuania.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/Latvian-List/adblock-latvian/master/lists/latvian-list.txt", "http://raw.githubusercontent.com/Latvian-List/adblock-latvian/master/lists/latvian-list.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-adblock-filters/adblock.txt", "http://raw.githubusercontent.com/MajkiIT/polish-ads-filter/master/polish-adblock-filters/adblock.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlocker.txt", "http://raw.githubusercontent.com/MasterKia/PersianBlocker/main/PersianBlocker.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_ublock.txt", "http://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_ublock.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/betterwebleon/slovenian-list/master/filters.txt", "http://raw.githubusercontent.com/betterwebleon/slovenian-list/master/filters.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/brave/adblock-lists/master/custom/is.txt", "http://raw.githubusercontent.com/brave/adblock-lists/master/custom/is.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/dimisa-RUAdList/RUAdListCDN/main/lists/ruadlist.ubo.min.txt", "http://raw.githubusercontent.com/dimisa-RUAdList/RUAdListCDN/main/lists/ruadlist.ubo.min.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/easylist-thailand/easylist-thailand/master/subscription/easylist-thailand.txt", "http://raw.githubusercontent.com/easylist-thailand/easylist-thailand/master/subscription/easylist-thailand.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/easylist/EasyListHebrew/master/EasyListHebrew.txt", "http://raw.githubusercontent.com/easylist/EasyListHebrew/master/EasyListHebrew.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/easylist/ruadlist/master/RuAdList-uBO.txt", "http://raw.githubusercontent.com/easylist/ruadlist/master/RuAdList-uBO.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/easylist/ruadlist/master/cntblock.txt", "http://raw.githubusercontent.com/easylist/ruadlist/master/cntblock.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/finnish-easylist-addition/finnish-easylist-addition/gh-pages/Finland_adb.txt", "http://raw.githubusercontent.com/finnish-easylist-addition/finnish-easylist-addition/gh-pages/Finland_adb.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/master/Frellwits-Swedish-Filter.txt", "http://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/master/Frellwits-Swedish-Filter.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/swefilter/swefilter.min.txt", "http://raw.githubusercontent.com/lassekongo83/Frellwits-filter-lists/swefilter/swefilter.min.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/olegwukr/polish-privacy-filters/master/anti-adblock.txt", "http://raw.githubusercontent.com/olegwukr/polish-privacy-filters/master/anti-adblock.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/tcptomato/ROad-Block/master/road-block-filters-light.txt", "http://raw.githubusercontent.com/tcptomato/ROad-Block/master/road-block-filters-light.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt", "http://raw.githubusercontent.com/tomasko126/easylistczechandslovak/master/filters.txt's filters", FilterGroup::Default, true),
+            ("http://raw.githubusercontent.com/ukrainianfilters/lists/main/combined/uBO/uBO.txt", "http://raw.githubusercontent.com/ukrainianfilters/lists/main/combined/uBO/uBO.txt's filters", FilterGroup::Default, true),
+            ("http://secure.fanboy.co.nz/fanboy-antifacebook.txt", "http://secure.fanboy.co.nz/fanboy-antifacebook.txt's filters", FilterGroup::Default, true),
+            ("http://secure.fanboy.co.nz/fanboy-cookiemonster_ubo.txt", "http://secure.fanboy.co.nz/fanboy-cookiemonster_ubo.txt's filters", FilterGroup::Default, true),
+            ("http://secure.fanboy.co.nz/fanboy-social_ubo.txt", "http://secure.fanboy.co.nz/fanboy-social_ubo.txt's filters", FilterGroup::Default, true),
+            ("http://someonewhocares.org/hosts/hosts", "http://someonewhocares.org/hosts/hosts's filters", FilterGroup::Default, true),
+            ("http://stanev.org/abp/adblock_bg.txt", "http://stanev.org/abp/adblock_bg.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/annoyances-cookies.txt", "http://ublockorigin.github.io/uAssets/filters/annoyances-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/annoyances.txt", "http://ublockorigin.github.io/uAssets/filters/annoyances.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/badlists.txt", "http://ublockorigin.github.io/uAssets/filters/badlists.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/badware.txt", "http://ublockorigin.github.io/uAssets/filters/badware.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/filters.txt", "http://ublockorigin.github.io/uAssets/filters/filters.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/lan-block.txt", "http://ublockorigin.github.io/uAssets/filters/lan-block.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/privacy.txt", "http://ublockorigin.github.io/uAssets/filters/privacy.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/quick-fixes.txt", "http://ublockorigin.github.io/uAssets/filters/quick-fixes.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/filters/unbreak.txt", "http://ublockorigin.github.io/uAssets/filters/unbreak.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/thirdparties/easylist-annoyances.txt", "http://ublockorigin.github.io/uAssets/thirdparties/easylist-annoyances.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/thirdparties/easylist-chat.txt", "http://ublockorigin.github.io/uAssets/thirdparties/easylist-chat.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/thirdparties/easylist-cookies.txt", "http://ublockorigin.github.io/uAssets/thirdparties/easylist-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt", "http://ublockorigin.github.io/uAssets/thirdparties/easylist-newsletters.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/thirdparties/easylist-notifications.txt", "http://ublockorigin.github.io/uAssets/thirdparties/easylist-notifications.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/thirdparties/easylist-social.txt", "http://ublockorigin.github.io/uAssets/thirdparties/easylist-social.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/thirdparties/easylist.txt", "http://ublockorigin.github.io/uAssets/thirdparties/easylist.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssets/thirdparties/easyprivacy.txt", "http://ublockorigin.github.io/uAssets/thirdparties/easyprivacy.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/annoyances-cookies.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/annoyances-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/annoyances.min.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/annoyances.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/badlists.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/badlists.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/badware.min.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/badware.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/filters.min.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/filters.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/lan-block.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/lan-block.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/privacy.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/quick-fixes.min.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/quick-fixes.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt", "http://ublockorigin.github.io/uAssetsCDN/filters/unbreak.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-annoyances.txt", "http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-annoyances.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-chat.txt", "http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-chat.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-cookies.txt", "http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-newsletters.txt", "http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-newsletters.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-notifications.txt", "http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-notifications.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-social.txt", "http://ublockorigin.github.io/uAssetsCDN/thirdparties/easylist-social.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/annoyances-cookies.txt", "http://ublockorigin.pages.dev/filters/annoyances-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/annoyances.min.txt", "http://ublockorigin.pages.dev/filters/annoyances.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/badlists.txt", "http://ublockorigin.pages.dev/filters/badlists.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/badware.min.txt", "http://ublockorigin.pages.dev/filters/badware.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/filters.min.txt", "http://ublockorigin.pages.dev/filters/filters.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/lan-block.txt", "http://ublockorigin.pages.dev/filters/lan-block.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/privacy.min.txt", "http://ublockorigin.pages.dev/filters/privacy.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/quick-fixes.min.txt", "http://ublockorigin.pages.dev/filters/quick-fixes.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/filters/unbreak.min.txt", "http://ublockorigin.pages.dev/filters/unbreak.min.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/thirdparties/easylist-annoyances.txt", "http://ublockorigin.pages.dev/thirdparties/easylist-annoyances.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/thirdparties/easylist-chat.txt", "http://ublockorigin.pages.dev/thirdparties/easylist-chat.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/thirdparties/easylist-cookies.txt", "http://ublockorigin.pages.dev/thirdparties/easylist-cookies.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/thirdparties/easylist-newsletters.txt", "http://ublockorigin.pages.dev/thirdparties/easylist-newsletters.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/thirdparties/easylist-notifications.txt", "http://ublockorigin.pages.dev/thirdparties/easylist-notifications.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/thirdparties/easylist-social.txt", "http://ublockorigin.pages.dev/thirdparties/easylist-social.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/thirdparties/easylist.txt", "http://ublockorigin.pages.dev/thirdparties/easylist.txt's filters", FilterGroup::Default, true),
+            ("http://ublockorigin.pages.dev/thirdparties/easyprivacy.txt", "http://ublockorigin.pages.dev/thirdparties/easyprivacy.txt's filters", FilterGroup::Default, true),
+            ("http://www.void.gr/kargig/void-gr-filters.txt", "http://www.void.gr/kargig/void-gr-filters.txt's filters", FilterGroup::Default, true),
         ]
         .into_iter()
         .filter_map(|(url, title, group, enabled_by_default)| Self::parse_filter(url, title, group, enabled_by_default))
