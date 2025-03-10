@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
 
-      - uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1.0.6
         with:
           toolchain: nightly
           components: clippy
@@ -19,7 +19,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential libayatana-appindicator3-dev librsvg2-dev libgtk-3-dev libsoup2.4-dev libjavascriptcoregtk-4.0-dev
 
       - name: Install trunk
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.1
         with:
           command: install
           args: --locked --debug trunk
@@ -29,7 +29,7 @@ jobs:
 
       # Required for tailwindcss
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: 18
       - name: Install node packages
@@ -51,10 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4.2.2
 
       - name: Install rust
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.6
         with:
           toolchain: stable
           components: rustfmt
@@ -62,7 +62,7 @@ jobs:
           override: true
 
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.1
         with:
           command: fmt
           args: --all -- --check
@@ -83,10 +83,10 @@ jobs:
             target: aarch64-unknown-linux-gnu
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4.2.2
 
       - name: Cache build artifacts
-        uses: actions/cache@v3
+        uses: actions/cache@v4.2.2
         with:
           key:  ${{ matrix.os }}-${{ matrix.target }}-artifacts
           path: |
@@ -94,7 +94,7 @@ jobs:
             ~/.cargo
 
       - name: Install rust
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.6
         with:
           toolchain: ${{ matrix.rust }}
           profile: minimal
@@ -106,14 +106,14 @@ jobs:
         if: matrix.target == 'aarch64-unknown-linux-gnu'
         run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu libc6-dev-arm64-cross
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: 18
       - name: Install node packages
         working-directory: ./web_frontend
         run: npm i
       - name: Install trunk
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.1
         with:
           command: install
           args: --locked --debug trunk
@@ -121,18 +121,18 @@ jobs:
         run: rustup target add wasm32-unknown-unknown && trunk build --release
         working-directory: ./web_frontend
       - name: Build server
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.1
         with:
           command: build
           working-directory: .
           args: --release --target ${{ matrix.target }} --bin privaxy --target-dir target
       - name: Build deb
         run: cargo install cargo-deb && cargo deb -p privaxy --target ${{ matrix.target }} -o target/${{ matrix.target }}/release
-      - uses: actions/upload-artifact@v3           
+      - uses: actions/upload-artifact@v4.6.1          
         with:
           name: privaxy-deb-${{ matrix.target }}
           path: target/${{ matrix.target }}/release/privaxy_*.deb
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4.6.1
         with:
           name: privaxy-${{ matrix.target }}
           path: |
